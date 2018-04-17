@@ -41,7 +41,7 @@ namespace Client
                 Object messageLock = new object();
                 lock (messageLock)
                 {
-                    if(clientSocket.Connected)
+                    if (clientSocket.Connected)
                     {
                         byte[] recievedMessage = new byte[256];
                         stream.Read(recievedMessage, 0, recievedMessage.Length);
@@ -49,6 +49,24 @@ namespace Client
                     }
                 }
             });
+        }
+        public void Run()
+        {
+            while (true)
+            {
+                Parallel.Invoke(
+
+                    async () =>
+                    {
+                        await Send();
+                    },
+
+                    async () =>
+                    {
+                        await Receive();
+                    }
+                );
+            }
         }
     }
 }

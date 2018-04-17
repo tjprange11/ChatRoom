@@ -18,17 +18,37 @@ namespace Client
             clientSocket.Connect(IPAddress.Parse(IP), port);
             stream = clientSocket.GetStream();
         }
-        public void Send()
+        Task Send()
         {
-            string messageString = UI.GetInput();
-            byte[] message = Encoding.ASCII.GetBytes(messageString);
-            stream.Write(message, 0, message.Count());
+            return Task.Run(() =>
+            {
+                Object messageLock = new Object();
+                lock (messageLock)
+                {
+                    if (clientSocket.Connected)
+                    {
+                        string messageString = UI.GetInput();
+                        byte[] message = Encoding.ASCII.GetBytes(messageString);
+                        stream.Write(message, 0, message.Count());
+                    }
+                }
+            });
         }
-        public void Recieve()
+        Task Recieve()
         {
-            byte[] recievedMessage = new byte[256];
-            stream.Read(recievedMessage, 0, recievedMessage.Length);
-            UI.DisplayMessage(Encoding.ASCII.GetString(recievedMessage));
+            return Task.Run(() =>
+            {
+                Object messageLock = new object();
+                lock (messageLock)
+                {
+                    if(clientSocket.Connected)
+                    {
+                        byte[] recievedMessage = new byte[256];
+                        stream.Read(recievedMessage, 0, recievedMessage.Length);
+                        UI.DisplayMessage(Encoding.ASCII.GetString(recievedMessage));
+                    }
+                }
+            });
         }
     }
 }

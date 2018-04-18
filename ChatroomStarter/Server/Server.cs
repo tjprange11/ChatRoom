@@ -25,13 +25,21 @@ namespace Server
             string message = client.Recieve();
             Respond(message);
         }
-        private void AcceptClient()
+        Task AcceptClient()
         {
-            TcpClient clientSocket = default(TcpClient);
-            clientSocket = server.AcceptTcpClient();
-            Console.WriteLine("Connected");
-            NetworkStream stream = clientSocket.GetStream();
-            client = new Client(stream, clientSocket);
+            return Task.Run(() =>
+            {
+                Object clientLock = new object();
+                lock (clientLock)
+                {
+                    TcpClient clientSocket = default(TcpClient);
+                    clientSocket = server.AcceptTcpClient();
+                    Console.WriteLine("Connected");
+                    NetworkStream stream = clientSocket.GetStream();
+                    client = new Client(stream, clientSocket);
+                }
+            });
+           
         }
         private void Respond(string body)
         {

@@ -16,8 +16,23 @@ namespace Server
         TcpListener server;
         public Server()
         {
-            server = new TcpListener(IPAddress.Parse("127.0.0.1"), 9999);
+            string computerIP = GetIPAddress();
+            Console.WriteLine("Local Computer IP Address: " + computerIP);
+            Console.WriteLine();
+            server = new TcpListener(IPAddress.Parse(computerIP), 9999);
             server.Start();
+        }
+        private string GetIPAddress()
+        {
+            string hostName = Dns.GetHostName();
+
+            IPAddress[] ipAddress = Dns.GetHostAddresses(hostName);
+            string computerIP = "127.0.0.1";
+            foreach (IPAddress ip4 in ipAddress.Where(ip => ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork))
+            {
+                computerIP = ip4.ToString();
+            }
+            return computerIP;
         }
         public void Run()
         {

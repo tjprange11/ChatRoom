@@ -9,11 +9,6 @@ namespace Server
 {
     class TextLogger : ILogger
     {
-        //memeber variables
-
-        //constructor
-
-        //member methods
         public void Save(Message message)
         {
             StreamWriter streamWriter = null;

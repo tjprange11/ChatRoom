@@ -22,6 +22,7 @@ namespace Server
         {
             users = new Dictionary<int, ISubscriber>();
             messages = new Queue<Message>();
+            logger = new TextLogger();
             string computerIP = GetIPAddress();
             Console.WriteLine("Local Computer IP Address: " + computerIP);
             Console.WriteLine();

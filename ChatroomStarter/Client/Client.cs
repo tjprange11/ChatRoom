@@ -10,33 +10,26 @@ namespace Client
 {
     class Client
     {
-        public string getUserName;
         TcpClient clientSocket;
         NetworkStream stream;
         public string displayName;
-        public Client(string IP, int port)
+        public string serverIP = "";
+        public Client(int port)
         {
-<<<<<<< HEAD
-            DisplayName();
-=======
+            while (serverIP.Length < 13)
+            {
+                Console.WriteLine("Please enter the IP Address for the Server Computer");
+                serverIP = UI.GetInput();
+            }
             SetDisplayName();
->>>>>>> a45d2fe607b2648ad1b201ee019303581803c7e8
             clientSocket = new TcpClient();
-            clientSocket.Connect(IPAddress.Parse(IP), port);
+            clientSocket.Connect(IPAddress.Parse(serverIP), port);
             stream = clientSocket.GetStream();
         }
-<<<<<<< HEAD
-        public void DisplayName()
-        {
-            UI.DisplayMessage ("What is your name?");
-            getUserName = UI.GetInput();
-
-=======
         private void SetDisplayName()
         {
             UI.DisplayMessage("What would you like your display name to be?");
             displayName = UI.GetInput();
->>>>>>> a45d2fe607b2648ad1b201ee019303581803c7e8
         }
         Task Send()
         {

@@ -12,12 +12,12 @@ namespace Server
 {
     class Server
     {
-        public static Client client;
+        //member variables
         TcpListener server;
         Dictionary<int, ISubscriber> users;
         Queue<Message> messages;
         ILogger logger;
-
+        //constructor
         public Server()
         {
             users = new Dictionary<int, ISubscriber>();
@@ -29,7 +29,7 @@ namespace Server
             server = new TcpListener(IPAddress.Parse(computerIP), 9999);
             server.Start();
         }
-
+        //member methods
         private string GetIPAddress()
         {
             string hostName = Dns.GetHostName();

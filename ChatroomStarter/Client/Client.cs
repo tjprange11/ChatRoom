@@ -21,10 +21,10 @@ namespace Client
                 Console.WriteLine("Please enter the IP Address for the Server Computer");
                 serverIP = UI.GetInput();
             }
-            SetDisplayName();
             clientSocket = new TcpClient();
             clientSocket.Connect(IPAddress.Parse(serverIP), port);
             stream = clientSocket.GetStream();
+            SetDisplayName();
         }
         private void SetDisplayName()
         {

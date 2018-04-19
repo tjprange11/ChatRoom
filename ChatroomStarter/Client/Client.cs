@@ -12,7 +12,6 @@ namespace Client
     {
         TcpClient clientSocket;
         NetworkStream stream;
-        public string displayName;
         public string serverIP = "";
         public Client(int port)
         {
@@ -24,12 +23,14 @@ namespace Client
             clientSocket = new TcpClient();
             clientSocket.Connect(IPAddress.Parse(serverIP), port);
             stream = clientSocket.GetStream();
-            SetDisplayName();
+            string displayName = GetDisplayName();
+            byte[] message = Encoding.ASCII.GetBytes(displayName);
+            stream.Write(message, 0, message.Count());
         }
-        private void SetDisplayName()
+        private string GetDisplayName()
         {
             UI.DisplayMessage("What would you like your display name to be?");
-            displayName = UI.GetInput();
+            return UI.GetInput();
         }
         Task Send()
         {

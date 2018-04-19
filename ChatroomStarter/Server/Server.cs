@@ -13,10 +13,13 @@ namespace Server
     class Server
     {
         Dictionary<int, ISubscriber> users;
+        Queue<Message> messages;
         TcpListener server;
         ILogger logger;
         public Server()
         {
+            users = new Dictionary<int, ISubscriber>();
+            messages = new Queue<Message>();
             string computerIP = GetIPAddress();
             Console.WriteLine("Local Computer IP Address: " + computerIP);
             Console.WriteLine();
@@ -50,12 +53,33 @@ namespace Server
                 {
                     for (int i = 0; i < users.Count; i++)
                     {
-                        Client currentUser = (Client)users.ElementAt(i).Value;
+                        ISubscriber currentUser = (ISubscriber)users.ElementAt(i).Value;
                         if (!currentUser.CheckIfConnected())
                         {
                             int userKey = users.ElementAt(i).Key;
                             users.Remove(userKey);
                         }
+                    }
+                }
+            });
+        }
+        Task SendAllMessages()
+        {
+            return Task.Run(() =>
+            {
+                Object messageLock = new Object();
+                lock (messageLock)
+                {
+                    if (messages.Count > 0)
+                    {
+                        for (int i = 0; i < users.Count; i++)
+                        {
+                            for (int j = 0; j < messages.Count; j++)
+                            {
+                                users.ElementAt(i).Value.Send(messages.ElementAt(j));
+                            }
+                        }
+                        messages.Clear();
                     }
                 }
             });
@@ -87,10 +111,6 @@ namespace Server
             {
                 users.ElementAt(i).Value.Send(notification);
             }
-        }
-        private void Respond(string body)
-        {
-             client.Send(body);
         }
     }
 }

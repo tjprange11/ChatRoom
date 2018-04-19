@@ -14,6 +14,7 @@ namespace Server
     {
         Dictionary<int, ISubscriber> users;
         TcpListener server;
+        ILogger logger;
         public Server()
         {
             string computerIP = GetIPAddress();
@@ -40,6 +41,25 @@ namespace Server
             string message = client.Recieve();
             Respond(message);
         }
+        Task CheckIfConnected()
+        {
+            return Task.Run(() =>
+            {
+                Object userListLock = new Object();
+                lock (userListLock)
+                {
+                    for (int i = 0; i < users.Count; i++)
+                    {
+                        Client currentUser = (Client)users.ElementAt(i).Value;
+                        if (!currentUser.CheckIfConnected())
+                        {
+                            int userKey = users.ElementAt(i).Key;
+                            users.Remove(userKey);
+                        }
+                    }
+                }
+            });
+        }
         Task AcceptUser()
         {
             return Task.Run(() =>
@@ -62,7 +82,7 @@ namespace Server
         public void NotifyUsersOfNewUser(Client user)
         {
             Message notification = new Message(user, "I've joined the chat!");
-            log.Save(notification);
+            logger.Save(notification);
             for (int i = 0; i < users.Count; i++)
             {
                 users.ElementAt(i).Value.Send(notification);

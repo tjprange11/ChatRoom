@@ -12,10 +12,12 @@ namespace Server
 {
     class Server
     {
+        public static Client client;
+        TcpListener server;
         Dictionary<int, ISubscriber> users;
         Queue<Message> messages;
-        TcpListener server;
         ILogger logger;
+
         public Server()
         {
             users = new Dictionary<int, ISubscriber>();
@@ -26,6 +28,7 @@ namespace Server
             server = new TcpListener(IPAddress.Parse(computerIP), 9999);
             server.Start();
         }
+
         private string GetIPAddress()
         {
             string hostName = Dns.GetHostName();
@@ -38,6 +41,7 @@ namespace Server
             }
             return computerIP;
         }
+
         public void Run()
         {
             while (true)
@@ -68,6 +72,7 @@ namespace Server
                 );
             }
         }
+
         Task CheckIfConnected()
         {
             return Task.Run(() =>
@@ -87,6 +92,7 @@ namespace Server
                 }
             });
         }
+
         Task SendAllMessages()
         {
             return Task.Run(() =>
@@ -108,6 +114,7 @@ namespace Server
                 }
             });
         }
+
         Task SendUsers(Dictionary<int, ISubscriber> users, Client client)
         {
             return Task.Run(() =>
@@ -133,20 +140,7 @@ namespace Server
                 }
             });
         }
-        Task SendUserMessage(Client user, Message message)
-        {
-            return Task.Run(() =>
-            {
-                Object messageLock = new Object();
-                lock (messageLock)
-                {
-                    if (user.CheckIfConnected())
-                    {
-                        user.Send(message);
-                    }
-                }
-            });
-        }
+
         Task GetAllMessages()
         {
             return Task.Run(() =>
@@ -166,6 +160,7 @@ namespace Server
                 }
             });
         }
+
         Task GetUserMessage(ISubscriber user)
         {
             return Task.Run(() =>
@@ -183,6 +178,7 @@ namespace Server
                 }
             });
         }
+
         Task AcceptUser()
         {
             return Task.Run(() =>
@@ -213,3 +209,4 @@ namespace Server
         }
     }
 }
+

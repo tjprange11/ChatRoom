@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Server
 {
-    class Client
+    class Client : ISubscriber
     {
         NetworkStream stream;
         TcpClient client;
@@ -41,14 +41,37 @@ namespace Server
                 }
             }
         }
-        public string Recieve()
+        public Message Recieve()
         {
-            byte[] recievedMessage = new byte[256];
-            stream.Read(recievedMessage, 0, recievedMessage.Length);
-            string recievedMessageString = Encoding.ASCII.GetString(recievedMessage);
-            Console.WriteLine(recievedMessageString);
-            return recievedMessageString;
+            Object recieveLock = new Object();
+            lock (recieveLock)
+            {
+                byte[] recievedMessage = new byte[256];
+                try
+                {
+                    stream.Read(recievedMessage, 0, recievedMessage.Length);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("An error occurred: '{0}'", e);
+                }
+                string recievedMessageString;
+                if (recievedMessage[0] == 0)
+                {
+                    recievedMessageString = "I've left the chat!";
+                }
+                else
+                {
+                    recievedMessageString = Encoding.ASCII.GetString(recievedMessage);
+                }
+                Message message = new Message(this, recievedMessageString);
+                return message;
+            }
         }
 
+        public bool CheckIfConnected()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

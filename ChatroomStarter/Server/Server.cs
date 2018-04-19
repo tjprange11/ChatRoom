@@ -123,6 +123,42 @@ namespace Server
                 }
             });
         }
+        Task GetAllMessages()
+        {
+            return Task.Run(() =>
+            {
+                Object messageLock = new Object();
+                lock (messageLock)
+                {
+                    for (int i = 0; i < users.Count; i++)
+                    {
+                        Parallel.Invoke(
+                            async () =>
+                            {
+                                await GetUserMessage(users.ElementAt(i).Value);
+                            }
+                        );
+                    }
+                }
+            });
+        }
+        Task GetUserMessage(ISubscriber user)
+        {
+            return Task.Run(() =>
+            {
+                Object messageLock = new Object();
+                lock (messageLock)
+                {
+                    if (user.CheckIfConnected())
+                    {
+                        Message message = user.Recieve();
+                        Console.WriteLine(message.Body);
+                        logger.Save(message);
+                        messages.Enqueue(message);
+                    }
+                }
+            });
+        }
         Task AcceptUser()
         {
             return Task.Run(() =>

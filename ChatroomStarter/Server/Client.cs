@@ -9,7 +9,7 @@ namespace Server
 {
     class Client : ISubscriber
     {
-        NetworkStream stream;
+        public NetworkStream stream;
         TcpClient client;
         public int UserId;
         public string displayName;

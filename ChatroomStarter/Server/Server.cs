@@ -53,7 +53,7 @@ namespace Server
                 {
                     for (int i = 0; i < users.Count; i++)
                     {
-                        ISubscriber currentUser = (ISubscriber)users.ElementAt(i).Value;
+                        Client currentUser = (Client)users.ElementAt(i).Value;
                         if (!currentUser.CheckIfConnected())
                         {
                             int userKey = users.ElementAt(i).Key;
@@ -84,7 +84,32 @@ namespace Server
                 }
             });
         }
-        Task AcceptUser()
+        Task SendUsers(Dictionary<int, ISubscriber> users, Client client)
+        {
+            return Task.Run(() =>
+            {
+                Object sendLock = new Object();
+                lock (sendLock)
+                {
+                    try
+                    {
+                        if (users.Count > 0)
+                        {
+                            for (int i = 0; i < users.Count; i++)
+                            {
+                                byte[] userName = Encoding.ASCII.GetBytes(users.Values.ElementAt(i).ToString());
+                                client.stream.Write(userName, 0, userName.Count());
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("An error occurred: '{0}'", e);
+                    }
+                }
+            });
+        }
+            Task AcceptUser()
         {
             return Task.Run(() =>
             {

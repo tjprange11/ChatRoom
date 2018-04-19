@@ -12,6 +12,7 @@ namespace Server
 {
     class Server
     {
+        private bool isCommunicationOpen = true;
         public static Client client;
         TcpListener server;
         public Server()
@@ -21,16 +22,25 @@ namespace Server
         }
         public void Run()
         {
-            AcceptClient();
-            string message = client.Recieve();
-            Respond(message);
-        }
-        Task AcceptClient()
-        {
-            return Task.Run(() =>
+            Task[] tasks = new Task[5];
+            for (int i = 0; i < 5; i++)
             {
-                Object clientLock = new object();
-                lock (clientLock)
+                AcceptClient();
+                while (isCommunicationOpen)
+
+                {
+                    string message = client.Recieve();
+                    Respond(message);
+                }
+            }
+        }
+
+        AcceptClient()
+        {
+           
+           
+             
+
                 {
                     TcpClient clientSocket = default(TcpClient);
                     clientSocket = server.AcceptTcpClient();
@@ -38,7 +48,7 @@ namespace Server
                     NetworkStream stream = clientSocket.GetStream();
                     client = new Client(stream, clientSocket);
                 }
-            });
+           
            
         }
         private void Respond(string body)

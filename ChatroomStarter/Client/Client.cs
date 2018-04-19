@@ -10,13 +10,21 @@ namespace Client
 {
     class Client
     {
+        public string getUserName;
         TcpClient clientSocket;
         NetworkStream stream;
         public Client(string IP, int port)
         {
+            DisplayName();
             clientSocket = new TcpClient();
             clientSocket.Connect(IPAddress.Parse(IP), port);
             stream = clientSocket.GetStream();
+        }
+        public void DisplayName()
+        {
+            UI.DisplayMessage ("What is your name?");
+            getUserName = UI.GetInput();
+
         }
         Task Send()
         {
@@ -63,7 +71,7 @@ namespace Client
 
                     async () =>
                     {
-                        await Receive();
+                        await Recieve();
                     }
                 );
             }

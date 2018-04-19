@@ -40,9 +40,33 @@ namespace Server
         }
         public void Run()
         {
-            AcceptClient();
-            string message = client.Recieve();
-            Respond(message);
+            while (true)
+            {
+                Parallel.Invoke(
+                    //This thread is always listening for new clients (users)
+                    async () =>
+                    {
+                        await AcceptUser();
+                    },
+                    //This thread is always listening for new messages
+                    async () =>
+                    {
+                        await GetAllMessages();
+                    },
+                    //This thread is always sending new messages
+                    async () =>
+                    {
+                        await SendAllMessages();
+                    },
+                    //This thread is always checking for new connections and checking for disconnections
+                    async () =>
+                    {
+                        await CheckIfConnected();
+                    }
+
+
+                );
+            }
         }
         Task CheckIfConnected()
         {

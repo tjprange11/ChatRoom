@@ -109,7 +109,21 @@ namespace Server
                 }
             });
         }
-            Task AcceptUser()
+        Task SendUserMessage(Client user, Message message)
+        {
+            return Task.Run(() =>
+            {
+                Object messageLock = new Object();
+                lock (messageLock)
+                {
+                    if (user.CheckIfConnected())
+                    {
+                        user.Send(message);
+                    }
+                }
+            });
+        }
+        Task AcceptUser()
         {
             return Task.Run(() =>
             {

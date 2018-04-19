@@ -12,7 +12,7 @@ namespace Server
 {
     class Server
     {
-        public static Client client;
+        Dictionary<int, ISubscriber> users;
         TcpListener server;
         public Server()
         {
@@ -40,21 +40,33 @@ namespace Server
             string message = client.Recieve();
             Respond(message);
         }
-        Task AcceptClient()
+        Task AcceptUser()
         {
             return Task.Run(() =>
             {
-                Object clientLock = new object();
-                lock (clientLock)
+                Object userListLock = new Object();
+                lock (userListLock)
                 {
                     TcpClient clientSocket = default(TcpClient);
                     clientSocket = server.AcceptTcpClient();
                     Console.WriteLine("Connected");
                     NetworkStream stream = clientSocket.GetStream();
-                    client = new Client(stream, clientSocket);
+                    Client user = new Client(stream, clientSocket);
+                    user.displayName = user.ReceiveDisplayName();
+                    users.Add(user.UserId, user);
+                    NotifyUsersOfNewUser(user);
                 }
             });
-           
+        }
+
+        public void NotifyUsersOfNewUser(Client user)
+        {
+            Message notification = new Message(user, "I've joined the chat!");
+            log.Save(notification);
+            for (int i = 0; i < users.Count; i++)
+            {
+                users.ElementAt(i).Value.Send(notification);
+            }
         }
         private void Respond(string body)
         {

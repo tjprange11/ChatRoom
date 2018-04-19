@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 
 namespace Server
 {
-    interface ISubscriber
+    interface ILogger
     {
-        void Send(Message message);
-        Message Recieve();
-        bool CheckIfConnected();
-        void CloseStream();
+        void Save(Message message);
     }
 }

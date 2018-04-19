@@ -68,10 +68,27 @@ namespace Server
                 return message;
             }
         }
+        public string ReceiveDisplayName()
+        {
+            byte[] receivedDisplayNameArray = new byte[256];
+            stream.Read(receivedDisplayNameArray, 0, receivedDisplayNameArray.Length);
+            int displayNameLength = 0;
+            for (int i = 0; i < receivedDisplayNameArray.Length; i++)
+            {
+                if (receivedDisplayNameArray[i] != 0)
+                {
+                    displayNameLength++;
+                }
+            }
+            byte[] displayNameArray = new byte[displayNameLength];
+            Array.Copy(receivedDisplayNameArray, displayNameArray, displayNameLength);
+            string receivedDisplayName = Encoding.ASCII.GetString(displayNameArray);
+            return receivedDisplayName;
+        }
 
         public bool CheckIfConnected()
         {
-            throw new NotImplementedException();
+            return client.Connected;
         }
     }
 }

@@ -15,12 +15,12 @@ namespace Client
         public string displayName;
         public Client(string IP, int port)
         {
-            GetDisplayName();
+            SetDisplayName();
             clientSocket = new TcpClient();
             clientSocket.Connect(IPAddress.Parse(IP), port);
             stream = clientSocket.GetStream();
         }
-        private void GetDisplayName()
+        private void SetDisplayName()
         {
             UI.DisplayMessage("What would you like your display name to be?");
             displayName = UI.GetInput();

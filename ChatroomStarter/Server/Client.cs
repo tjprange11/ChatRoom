@@ -11,17 +11,35 @@ namespace Server
     {
         NetworkStream stream;
         TcpClient client;
-        public string UserId;
+        public int UserId;
+        public string displayName;
         public Client(NetworkStream Stream, TcpClient Client)
         {
             stream = Stream;
             client = Client;
-            UserId = "495933b6-1762-47a1-b655-483510072e73";
+            UserId = stream.GetHashCode();
+            this.displayName = UserId.ToString();
         }
-        public void Send(string Message)
+        public void CloseStream()
         {
-            byte[] message = Encoding.ASCII.GetBytes(Message);
-            stream.Write(message, 0, message.Count());
+            stream.Close();
+            client.Close();
+        }
+        public void Send(Message message)
+        {
+            Object sendLock = new Object();
+            lock (sendLock)
+            {
+                try
+                {
+                    byte[] messageBody = Encoding.ASCII.GetBytes(message.Body);
+                    stream.Write(messageBody, 0, messageBody.Count());
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("An error occurred: '{0}'", e);
+                }
+            }
         }
         public string Recieve()
         {

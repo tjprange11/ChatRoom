@@ -35,10 +35,7 @@ namespace Server
                     byte[] messageBody = Encoding.ASCII.GetBytes(message.Body);
                     stream.Write(messageBody, 0, messageBody.Count());
                 }
-                catch (Exception e)
-                {
-                    Console.WriteLine("An error occurred: '{0}'", e);
-                }
+                catch { }
             }
         }
         public Message Recieve()
@@ -51,10 +48,7 @@ namespace Server
                 {
                     stream.Read(recievedMessage, 0, recievedMessage.Length);
                 }
-                catch (Exception e)
-                {
-                    Console.WriteLine("An error occurred: '{0}'", e);
-                }
+                catch { }
                 string recievedMessageString;
                 if (recievedMessage[0] == 0)
                 {
